@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Wakahost</title>
+  </head>
+  <body>
+    <h1>Host a file on the Waka Network</h1>
+    <input type="file" id="file-input" />
+    <h3>Contents of the file:</h3>
+    <pre id="file-content"></pre>
+    <script type="text/javascript">
+      document.getElementById('file-input').addEventListener('change', Wakahost.ReadFile, false)
+    </script>
+  </body>
+</html>
