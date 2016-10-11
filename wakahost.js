@@ -8,6 +8,7 @@ Wakahost = {
     params = window.location.hash.split('#')
     if (params[1]) {
       console.log(params[1])
+      Waka.api.Search(params[1])
       Waka.api.Get(params[1], function(e,r){
         Wakahost.InjectHTML(r.content)
       })
@@ -63,4 +64,7 @@ Wakahost.InitRouter()
 
 Waka.api.Emitter.on('connected', listener = function(){
   Wakahost.Router()
+})
+Waka.api.Emitter.on('newshare', listener = function(content){
+  Wakahost.InjectHTML(content)
 })
