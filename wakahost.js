@@ -65,6 +65,6 @@ Wakahost.InitRouter()
 Waka.api.Emitter.on('connected', listener = function(){
   Wakahost.Router()
 })
-Waka.api.Emitter.on('newshare', listener = function(content){
-  Wakahost.InjectHTML(content)
+Waka.api.Emitter.on('newshare', listener = function(r){
+  Wakahost.InjectHTML(r.content)
 })
