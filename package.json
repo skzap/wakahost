@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
+    "is-data-uri": "^0.1.0",
     "wakajs": "^0.0.12"
   }
 }

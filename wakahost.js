@@ -1,4 +1,5 @@
 require('../waka2/waka.js')
+var isDataUri = require('is-data-uri')
 var Config = require('./config.json')
 
 Waka.connect(Config.SignalServer)
@@ -10,10 +11,24 @@ Wakahost = {
       console.log(params[1])
       Waka.api.Search(params[1])
       Waka.api.Get(params[1], function(e,r){
-        Wakahost.InjectHTML(r.content)
+        if (e) throw e
+        Wakahost.Display(r)
       })
     } else {
       window.location.hash = '#' + Config.Homepage
+    }
+  },
+  Display: function(r) {
+    if (isDataUri(r.content)) {
+      // put into an image then load it as html
+      var html = '<img src="'+r.content+'" alt="'+r.title+'">'
+      Wakahost.InjectHTML(html)
+
+      // opens in new tab
+      // window.open(r.content)
+    } else {
+      // text content
+      Wakahost.InjectHTML(r.content)
     }
   },
   InitRouter: function() {
@@ -50,7 +65,7 @@ Wakahost = {
     reader.addEventListener("load", function () {
       var contents = reader.result
       Waka.api.Set(file.name, contents, {}, function(e, r) {
-        Wakahost.DisplayContents(contents)
+        window.location.hash = '#' + file.name
       })
     }, false)
     if (Wakahost.IsText(file.type)) {
@@ -58,10 +73,6 @@ Wakahost = {
     } else {
       reader.readAsDataURL(file)
     }
-  },
-  DisplayContents: function(contents) {
-    var element = document.getElementById('file-content');
-    element.innerHTML = contents;
   },
   IsText: function(mimeType) {
     switch (mimeType) {
@@ -77,6 +88,15 @@ Wakahost = {
       default:
         return false
     }
+  },
+  IsImage: function(mimeType) {
+    var type = mimeType.split('/')[0]
+    switch (type) {
+      case 'image':
+        return true
+      default:
+        return false
+    }
   }
 }
 
@@ -86,5 +106,5 @@ Waka.api.Emitter.on('connected', listener = function(){
   Wakahost.Router()
 })
 Waka.api.Emitter.on('newshare', listener = function(r){
-  Wakahost.InjectHTML(r.content)
+  Wakahost.Display(r)
 })
