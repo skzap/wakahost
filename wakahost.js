@@ -1,6 +1,5 @@
 require('../waka2/waka.js')
 var parseDataUri = require('parse-data-uri')
-var download = require('./download.js')
 var Config = require('./config.json')
 
 Waka.connect(Config.SignalServer)
