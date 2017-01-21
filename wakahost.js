@@ -1,4 +1,4 @@
-require('../waka3/waka.js')
+require('../waka2/waka.js')
 var Config = require('./config.json')
 
 Waka.connect(Config.SignalServer)
@@ -42,21 +42,41 @@ Wakahost = {
   },
   ReadFile: function(e) {
     var file = e.target.files[0]
-    if (!file) {
-      return
-    }
+    if (!file) return
+    console.log("Filename: " + file.name);
+    console.log("MIME Type: " + file.type);
+    console.log("Size: " + file.size + " bytes");
     var reader = new FileReader();
-    reader.onload = function(e) {
-      var contents = e.target.result
+    reader.addEventListener("load", function () {
+      var contents = reader.result
       Waka.api.Set(file.name, contents, {}, function(e, r) {
         Wakahost.DisplayContents(contents)
       })
-    };
-    reader.readAsText(file);
+    }, false)
+    if (Wakahost.IsText(file.type)) {
+      reader.readAsText(file)
+    } else {
+      reader.readAsDataURL(file)
+    }
   },
   DisplayContents: function(contents) {
     var element = document.getElementById('file-content');
     element.innerHTML = contents;
+  },
+  IsText: function(mimeType) {
+    switch (mimeType) {
+      case 'text/css':
+      case 'text/csv':
+      case 'text/html':
+      case 'text/calendar':
+      case 'text/plain':
+      case 'application/javascript':
+      case 'application/json':
+      case 'application/xhtml+xml':
+        return true
+      default:
+        return false
+    }
   }
 }
 
