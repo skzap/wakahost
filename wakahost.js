@@ -1,5 +1,6 @@
 require('../waka2/waka.js')
-var isDataUri = require('is-data-uri')
+var parseDataUri = require('parse-data-uri')
+var download = require('./download.js')
 var Config = require('./config.json')
 
 Waka.connect(Config.SignalServer)
@@ -19,15 +20,35 @@ Wakahost = {
     }
   },
   Display: function(r) {
-    if (isDataUri(r.content)) {
-      // put into an image then load it as html
-      var html = '<img src="'+r.content+'" alt="'+r.title+'">'
+    try {
+      var file = parseDataUri(r.content)
+      switch (file.mimeType) {
+        case 'image/jpeg':
+        case 'image/png':
+        case 'image/svg+xml':
+        case 'image/gif':
+          var html = '<img src="'+r.content+'" alt="'+r.title+'">'
+          break;
+        case 'video/mp4':
+          var html = '<video controls autoplay loop><source type="video/mp4" src="'+r.content+'"></video>'
+          break;
+        case 'video/webm':
+          var html = '<video controls autoplay loop><source type="video/webm" src="'+r.content+'"></video>'
+          break;
+        case 'audio/mp3':
+          var html = '<audio controls src="'+r.content+'" />'
+          break;
+        default:
+          require("downloadjs")(file.data, r.title, file.mimeType);
+          //window.open('data:application/octet-stream;base64,'+r.content.split(',')[1])
+          return;
+      }
       Wakahost.InjectHTML(html)
-
-      // opens in new tab
-      // window.open(r.content)
-    } else {
-      // text content
+    } catch(e) {
+      if (e != 'TypeError: `uri` does not appear to be a Data URI (must begin with "data:")') console.log(e)
+      // if content is not a dataUri
+      // display raw text into the window
+      // good for raw html
       Wakahost.InjectHTML(r.content)
     }
   },
@@ -38,6 +59,7 @@ Wakahost = {
   },
   InjectJavascript: function(code) {
     // todo security
+    // unused
     eval(code)
   },
   InjectCSS: function(code) {

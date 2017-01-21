@@ -10,8 +10,9 @@
   "author": "Adrien M",
   "license": "ISC",
   "dependencies": {
+    "downloadjs": "^1.4.6",
     "express": "^4.14.0",
-    "is-data-uri": "^0.1.0",
+    "parse-data-uri": "^0.2.0",
     "wakajs": "^0.0.12"
   }
 }
